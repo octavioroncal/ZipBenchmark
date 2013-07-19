@@ -8,15 +8,16 @@ import org.junit.Test;
 
 public class ZipToFSComparate {
 
-	private int numFiles = 10000;
+	private int numFiles = 1000000;
 
+	
 	@After
 	public void tearDown() {
 		new File("test.zip").delete();
 		deleteFolder(new File("2000/"));
 	}
 
-	// @Test
+	@Test
 	public void writeBench() throws Exception {
 		Date initDate = new Date();
 		ZipTest.createZip(numFiles);
@@ -32,17 +33,38 @@ public class ZipToFSComparate {
 	@Test
 	public void readBench() throws Exception {
 		createZip();
-		//createFS();
+		createFS();
 		Date initDate = new Date();
 		ZipTest.readZip();
 		Date zipDate = new Date();
 		System.out.println("Time to read zip: "
 				+ (zipDate.getTime() - initDate.getTime()) + " ms");
-		//FSTest.readFS(numFiles);
-		ZipTest.findDeepestFile();
+		FSTest.readFS(numFiles);
 		Date FSDate = new Date();
-		System.out.println("Time to find in zip: "
+		System.out.println("Time to read FS: "
 				+ (FSDate.getTime() - zipDate.getTime()) + " ms");
+	}
+
+	@Test
+	public void compareSearchs() throws Exception {
+		findTheDeepestZipFile();
+		findTheDeepestZipFileSorting();
+	}
+
+	public void findTheDeepestZipFile() throws Exception {
+		Date initDate = new Date();
+		ZipTest.findDeepestFile();
+		Date end = new Date();
+		System.out.println("Time to find in zip: "
+				+ (end.getTime() - initDate.getTime()) + " ms");
+	}
+
+	public void findTheDeepestZipFileSorting() throws Exception {
+		Date initDate = new Date();
+		ZipTest.findBySort();
+		Date end = new Date();
+		System.out.println("Time to sort & find in zip: "
+				+ (end.getTime() - initDate.getTime()) + " ms");
 	}
 
 	private void createZip() throws Exception {

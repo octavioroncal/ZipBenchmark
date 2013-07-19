@@ -5,7 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -59,23 +62,38 @@ public class ZipTest {
 			calendar.add(Calendar.SECOND, 1);
 			ZipEntry entry = new ZipEntry(formatter.format(calendar.getTime()));
 			InputStream stream = zipFile.getInputStream(entry);
+			ZipFile zipFile2 = new ZipFile("test.zip");
+			zipFile2.close();
 			stream.read(buffer);
 			stream.close();
 		}
-		System.out.println(formatter.format(calendar.getTime()));
 		zipFile.close();
 	}
 
-	@SuppressWarnings("resource")
+
 	public static void findDeepestFile() throws IOException {
 		String date = "0000/00/00/00/00/00";
-		Enumeration<? extends ZipEntry> zipEntries = new ZipFile("test.zip")
-				.entries();
+		 ZipFile zipFile = new ZipFile("test.zip");
+		Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
 		while (zipEntries.hasMoreElements()) {
 			String newEntry = zipEntries.nextElement().getName();
 			if (newEntry.compareTo(date) > 0)
 				date = newEntry;
 		}
-		System.out.println(date);
+		zipFile.close();
+	}
+	
+	@SuppressWarnings("all")
+	public static void findBySort() throws IOException {
+		ArrayList<ZipEntry> list = (ArrayList<ZipEntry>) Collections.list(new ZipFile("test.zip")
+		.entries());
+		Collections.sort(list, new CustomComparator());
+	}
+	
+	public static class CustomComparator implements Comparator<ZipEntry> {
+	    @Override
+	    public int compare(ZipEntry o1, ZipEntry o2) {
+	        return o1.getName().compareTo(o2.getName());
+	    }
 	}
 }
